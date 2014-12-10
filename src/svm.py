@@ -7,7 +7,7 @@ import time
 
 
 TRAIN_SIZE = 9000
-X_train, y_train = load_svmlight_file("../dataset/original/ml14fall_train.dat")
+X_train, y_train = load_data("../dataset/original/ml14fall_train.dat")
 
 X_train_s, y_train_s = X_train[:TRAIN_SIZE], y_train[:TRAIN_SIZE]
 X_test_s, y_test_s = X_train[TRAIN_SIZE:], y_train[TRAIN_SIZE:]

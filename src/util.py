@@ -3,6 +3,7 @@ __author__ = 'bingo4508'
 from sklearn.datasets import load_svmlight_file
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 
 # 0 = 鼠, 1 = 牛, 2 = 虎, 3 = 兔, 4 = 龍, 5 = 蛇, 6 = 馬, 7 = 羊, 8 = 猴, 9 = 雞, 10 = 狗, 11 = 豬
@@ -24,16 +25,26 @@ def error_track_1(predict_label, answer_label):
     pass
 
 
-# array is a 1X12810 (ex) numpy sparse matrix
+def load_data(fn):
+    return load_svmlight_file(fn)
+
+
+# array is a list of 1X12810 (ex) numpy sparse matrix
 # Usage e.g:
 # X_train, y_train = load_svmlight_file("../dataset/original/ml14fall_train.dat")
-# draw(X_train[0])
+# draw(X_train[0:10])
 def draw(array, width=105):
-    li = array.todense().ravel().tolist()[0]
-    nrows = len(li)/width
-    r = []
-    for i in range(nrows):
-        r.append(np.array([li[i*width:i*width+width]]))
-    r = np.concatenate([e for e in r])
-    plt.imshow(r, cmap=plt.cm.gray_r, interpolation='nearest')
+    fig = []
+    for a in array:
+        li = a.todense().ravel().tolist()[0]
+        nrows = len(li)/width
+        r = []
+        for i in range(nrows):
+            r.append(np.array([li[i*width:i*width+width]]))
+        fig.append(np.concatenate([e for e in r]))
+    nrows = math.ceil(math.sqrt(len(fig)))
+    for i, e in enumerate(fig):
+        plt.subplot(nrows, nrows, i)
+        plt.axis('off')
+        plt.imshow(e, cmap=plt.cm.gray_r, interpolation='nearest')
     plt.show()
