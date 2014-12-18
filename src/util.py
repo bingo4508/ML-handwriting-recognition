@@ -33,7 +33,28 @@ def load_data(fn):
 # Usage e.g:
 # X_train, y_train = load_svmlight_file("../dataset/original/ml14fall_train.dat")
 # draw(X_train[0:10])
-def draw(array, width=105):
+def draw(array, width=105, flat=True):
+    if flat is True:
+        fig = []
+        for a in array:
+            li = a.todense().ravel().tolist()[0]
+            nrows = len(li)/width
+            r = []
+            for i in range(nrows):
+                r.append(np.array([li[i*width:i*width+width]]))
+            fig.append(np.concatenate([e for e in r]))
+    else:
+        fig = [e for e in array] if type(array) is list else [array]
+    nrows = math.ceil(math.sqrt(len(fig)))
+    for i, e in enumerate(fig):
+        plt.subplot(nrows, nrows, i)
+        plt.axis('off')
+        plt.imshow(e, cmap=plt.cm.gray_r, interpolation='nearest')
+    plt.show()
+
+
+# Transform a one-dimensional sparse array to a n x m dense matrix
+def to_matrix(array, width=105):
     fig = []
     for a in array:
         li = a.todense().ravel().tolist()[0]
@@ -42,9 +63,34 @@ def draw(array, width=105):
         for i in range(nrows):
             r.append(np.array([li[i*width:i*width+width]]))
         fig.append(np.concatenate([e for e in r]))
-    nrows = math.ceil(math.sqrt(len(fig)))
-    for i, e in enumerate(fig):
-        plt.subplot(nrows, nrows, i)
-        plt.axis('off')
-        plt.imshow(e, cmap=plt.cm.gray_r, interpolation='nearest')
-    plt.show()
+    return fig if len(fig) > 1 else fig[0]
+
+
+# x is a n x m np matrix (narray)
+def remove_blank(x):
+    brow = [i for i, row in enumerate(x) if sum(row) == 0]
+    bcol = [i for i, row in enumerate(x.T) if sum(row) == 0]
+    y = np.delete(x, brow, 0)
+    y = np.delete(y, bcol, 1)
+    return y
+
+
+# Change every element in narray to 1.0
+def to_black(x):
+    return np.array([[math.ceil(e) for e in r] for r in x])
+
+
+# x is a n x m np matrix (narray)
+def to_square_shape(x):
+    h, w = x.shape[0], x.shape[1]
+    k = abs((h - w)/2)
+    if h > w:
+        y = np.concatenate((np.array([[0]*h]*k), x.T))
+        y = np.concatenate((y, np.array([[0]*h]*k)))
+        y = y.T
+    else:
+        y = np.concatenate((np.array([[0]*w]*k), x))
+        y = np.concatenate((y, np.array([[0]*w]*k)))
+    return y
+
+
