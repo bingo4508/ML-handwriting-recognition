@@ -4,6 +4,8 @@ from sklearn.datasets import load_svmlight_file, dump_svmlight_file
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from skimage.morphology import skeletonize
+from skimage.transform import probabilistic_hough_line
 
 
 # 0 = 鼠, 1 = 牛, 2 = 虎, 3 = 兔, 4 = 龍, 5 = 蛇, 6 = 馬, 7 = 羊, 8 = 猴, 9 = 雞, 10 = 狗, 11 = 豬
@@ -56,6 +58,21 @@ def draw(array, width=105, flat=True):
         plt.imshow(e, cmap=plt.cm.gray_r, interpolation='nearest')
     plt.show()
 
+
+def draw_lines(array, width=105):
+    m = to_matrix(array, width=width)
+    x = skeletonize(m)
+    ax = plt.subplot(1, 3, 0)
+    ax.imshow(m, cmap=plt.cm.gray_r, interpolation='nearest')
+    ax = plt.subplot(1, 3, 1)
+    ax.imshow(x, cmap=plt.cm.gray_r, interpolation='nearest')
+    ax = plt.subplot(1, 3, 2)
+    ax.imshow(x*0, cmap=plt.cm.gray_r, interpolation='nearest')
+    lines = probabilistic_hough_line(x, threshold=10, line_length=5, line_gap=3)
+    for line in lines:
+        p0, p1 = line
+        ax.plot((p0[0], p1[0]), (p0[1], p1[1]))
+    plt.show()
 
 # Transform a one-dimensional sparse array to a n x m dense matrix
 def to_matrix(array, width=105):
