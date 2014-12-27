@@ -1,6 +1,6 @@
 __author__ = 'bingo4508'
 # -*- coding: UTF-8 -*-
-from sklearn.datasets import load_svmlight_file
+from sklearn.datasets import load_svmlight_file, dump_svmlight_file
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -27,6 +27,10 @@ def error_track_1(predict_label, answer_label):
 
 def load_data(fn):
     return load_svmlight_file(fn)
+
+
+def dump_data(X, y, fn):
+    dump_svmlight_file(X, y, fn)
 
 
 # array is a list of 1X12810 (ex) numpy sparse matrix
@@ -84,13 +88,16 @@ def to_black(x):
 def to_square_shape(x):
     h, w = x.shape[0], x.shape[1]
     k = abs((h - w)/2)
-    if h > w:
-        y = np.concatenate((np.array([[0]*h]*k), x.T))
-        y = np.concatenate((y, np.array([[0]*h]*k)))
-        y = y.T
+    if k > 0:
+        if h > w:
+            y = np.concatenate((np.array([[0]*h]*k), x.T))
+            y = np.concatenate((y, np.array([[0]*h]*k)))
+            y = y.T
+        else:
+            y = np.concatenate((np.array([[0]*w]*k), x))
+            y = np.concatenate((y, np.array([[0]*w]*k)))
+        return y
     else:
-        y = np.concatenate((np.array([[0]*w]*k), x))
-        y = np.concatenate((y, np.array([[0]*w]*k)))
-    return y
+        return x
 
 
