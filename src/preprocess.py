@@ -68,7 +68,7 @@ def diagonal(m, width, flat=True):
 def HoG(m, width, flat=True):
     if flat:
         m = to_matrix(m, width=width)
-    return np.array([hog(m, orientations=8, pixels_per_cell=(20, 20), cells_per_block=(1, 1))])
+    return np.array([hog(m, orientations=8, pixels_per_cell=(10, 10), cells_per_block=(2, 2))])
 
 
 def jdong(m, width, flat=True):
@@ -81,6 +81,9 @@ def jdong(m, width, flat=True):
     m = median(m, disk(2))
     m = gaussian_filter(m, sigma=0.5)
     m = skimage.transform.resize(m, (64, 64))
+    # m = HoG(m, 64, False)
+    # return m
+
     return np.resize(m, (1, 64**2))
     # Feature extraction
     #...
@@ -103,16 +106,16 @@ def preprocess(func, sparse_matrix, multiproc=-1, label=None):
 WIDTH = 64
 MULTITASK = 10
 OUTPUT_DIR = '../dataset/'
-OUTPUT = "../dataset/train_jdong_HoG.dat"
-func = HoG
+OUTPUT = os.path.join(OUTPUT_DIR, "train_jdong_64.dat")
+func = jdong
 
 if __name__ == '__main__':
     print "Loading data..."
 
     # data, label = load_data("../dataset/original/ml14fall_test1_no_answer.dat")
-    # data, label = load_data("../dataset/original/ml14fall_train.dat")
+    data, label = load_data(os.path.join(OUTPUT_DIR, "original/ml14fall_train.dat"))
 
-    data, label = load_data("../dataset/train_jdong_128.dat")
+    # data, label = load_data("../dataset/train_jdong_64.dat")
     # data, label = load_data("../dataset/test_p2.dat")
 
     ##############################################################################################

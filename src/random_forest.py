@@ -1,19 +1,18 @@
 __author__ = 'bingo4508'
 
 from sklearn.cross_validation import train_test_split
-from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.cross_validation import cross_val_score
 
 from util import *
 from datetime import datetime
 from sklearn.decomposition import RandomizedPCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.grid_search import GridSearchCV
 from sklearn.externals import joblib
 
-TRAIN_DATA = 'train_jdong_HoG_64'+'.scale'
+TRAIN_DATA = 'train_jdong_HoG_64'
 MODEL_NAME = 'train_jdong_HoG_64'
 
-VALIDATION = False
 TEST_SIZE = 0
 DUMP = True
 
@@ -23,7 +22,7 @@ SCALE = False
 ##############################################################################
 if __name__ == '__main__':
     print "Loading data..."
-    X_train, y_train = load_data("../dataset/%s" % TRAIN_DATA)
+    X_train, y_train = load_data("../dataset/%s.scale" % TRAIN_DATA)
 
     # Split data to train and test
     X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=TEST_SIZE, random_state=0)
@@ -49,15 +48,12 @@ if __name__ == '__main__':
 
 
     # Train --------------------------------------------------------------
-    tuned_parameters = [{'kernel': ['rbf'], 'gamma': [0.1, 1e-2, 1e-3], 'C': [10, 100, 1000]}]
     print "Training..."
     t1 = datetime.now()
-    if VALIDATION:
-        clf = GridSearchCV(SVC(), tuned_parameters, cv=5, verbose=2, n_jobs=-1).fit(X_train, y_train)
-        print clf.best_estimator_
-    else:
-        clf = SVC(kernel='rbf', C=10, gamma=0.1)
-        clf.fit(X_train, y_train)
+    clf = RandomForestClassifier(n_estimators=1000, max_depth=None, min_samples_split=1, random_state=0)
+    scores = cross_val_score(clf, X_train, y_train)
+    print "cross val: ", scores
+    clf.fit(X_train, y_train)
     print "Training %f secs" % (datetime.now() - t1).total_seconds()
 
     if TEST_SIZE > 0:
@@ -67,4 +63,4 @@ if __name__ == '__main__':
     if DUMP:
         # Dump model --------------------------------------------------------------
         print "Dumping model..."
-        joblib.dump(clf, '../model/svm/%s.pkl' % MODEL_NAME)
+        joblib.dump(clf, '../model/rf/%s.pkl' % MODEL_NAME)

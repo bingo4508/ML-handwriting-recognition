@@ -5,11 +5,14 @@ from datetime import datetime
 from sklearn.externals import joblib
 from sklearn.decomposition import RandomizedPCA
 from sklearn.preprocessing import StandardScaler
+from os.path import join
 
 
-TRAIN_DATA = 'train_p5_from_p2_normalize_100'
-TEST_DATA = 'test_p5_from_p2_normalize_100'
-MODEL_NAME = 'train_p5_from_p2_normalize_100'
+MODEL_DIR = '../model/deep'
+TRAIN_DATA = 'train_jdong_HoG_64.scale'
+TEST_DATA = 'test_jdong_HoG_64.scale'
+MODEL_NAME = 'train_jdong_HoG_64.scale'
+
 PCA = False
 SCALE = False
 
@@ -17,7 +20,7 @@ SCALE = False
 if __name__ == '__main__':
     # Load data
     print "Loading data..."
-    X_test, y_test = load_data("../dataset/%s.dat" % TEST_DATA)
+    X_test, y_test = load_data("../dataset/%s" % TEST_DATA)
     if PCA or SCALE:
         X_train, y_train = load_data("../dataset/%s.dat" % TRAIN_DATA)
     else:
@@ -25,7 +28,7 @@ if __name__ == '__main__':
 
     # Load model
     print "Loading model..."
-    clf = joblib.load('../model/svm/%s.pkl' % MODEL_NAME)
+    clf = joblib.load(join(MODEL_DIR, '%s.pkl' % MODEL_NAME))
 
     if SCALE:
         scaler = StandardScaler()
